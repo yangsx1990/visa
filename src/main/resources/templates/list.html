@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<!--ztree-->
+<link rel="stylesheet" th:href="@{/ztree/zTreeStyle.css}"/>
+<head th:include="fragments/head::header"/>
+<body>
+<style>
+    .error {
+        color: #F00
+    }
+</style>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+                    <li><a href="#">系统管理</a></li>
+                    <li><a href="/member/list">系统用户管理</a></li>
+                    <!--<li class="active">内容列表</li>-->
+                </ul>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="col-lg-8">
+                        <h3 class="header smaller lighter blue">系统用户列表</h3>
+                        <div class="table-header">
+                            <a th:href="@{/user/add}" data-toggle="modal" data-target="#myModal"  class="btn btn-success">创建用户</a>
+                        </div>
+                        <div class="table-responsive">
+                            <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <span id="alertText"></span>
+                            </div>
+                            <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th class="hide">id</th>
+                                    <th>真实姓名</th>
+                                    <th>用户名</th>
+                                    <th>QQ号</th>
+                                    <th>地址</th>
+                                    <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<!--ztree-->
+<script type="text/javascript" th:src="@{/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/jquery.ztree.exedit.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+
+<script type="text/javascript">
+    <!--
+    var oTable1;
+    $(function () {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "sAjaxSource": "/index",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[3, "desc"]],
+            "aoColumns": [
+                {"sClass": "center", "bVisible": false, "mData": "id"},//此列不显示
+                {"sClass": "center", "bSortable": false, "mData": "id"},
+                {"sClass": "center", "bSortable": false, "mData": "name"},
+                {"sClass": "center", "bSortable": false, "mData": "qqNumber"},
+                {"sClass": "center", "bSortable": false, "mData": "address"},
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                    var edit = '<a href="/user/edit?id=' + data.id + '"data-toggle="modal" data-target="#myModal">编辑用户</a>&nbsp;&nbsp;&nbsp;';
+                    var password = '<a href="/user/editPassword?id=' + data.id + '"data-toggle="modal" data-target="#myModal">修改密码</a>&nbsp;&nbsp;&nbsp;';
+                    var role = '<a href="javascript:void(0);" onclick="clickRole(' + data.id + ')" >查看角色</a>&nbsp;&nbsp;&nbsp;';
+                    var del = '<a href="javascript:void(0);" onclick="clickdelete(' + data.id + ')" >删除</a>';
+                    return edit + password + role + del;
+                }
+                }
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+        })
+    })
+
+
+
+    var setting = {
+        check: {
+            enable: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        }
+    };
+
+
+
+    $("#checkAllTrue").bind("click", {type: "checkAllTrue"}, checkNode);
+
+    $("#checkAllFalse").bind("click", {type: "checkAllFalse"}, checkNode);
+
+    $("#submit").click(function (e, treeId, treeNode) {
+        //获取所有选中状态的id
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo"),
+            nodes = treeObj.getCheckedNodes(true),
+            v = "";
+        for (var i = 0; i < nodes.length; i++) {
+            v += nodes[i].id + ",";
+        }
+        $.ajax({
+            type: "POST",
+            url: "/user/addRoleUser",
+            data: {
+                userid: $("#userId").val(),
+                roleids: v,
+            },
+            async: false,
+            success: function (data) {
+                if (data) {
+                    layer.msg('更新用户角色成功！', {
+                        icon: 1
+                    });
+                    clickfunction(id)
+                } else {
+                    layer.msg('未选择角色或角色ID为空！', {
+                        icon: 2
+                    });
+                    clickRole($("#roleId").val())
+                }
+            }
+        });
+    })
+
+    function checkNode(e) {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            type = e.data.type,
+            nodes = zTree.getSelectedNodes();
+        if (type == "checkAllTrue") {
+            zTree.checkAllNodes(true);
+        } else if (type == "checkAllFalse") {
+            zTree.checkAllNodes(false);
+        }
+    }
+
+    -->
+</script>
+</body>
+</html>
